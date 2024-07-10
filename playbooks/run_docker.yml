@@ -1,0 +1,15 @@
+- hosts: my_vm
+  become: yes
+  tasks:
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+
+    - name: Run Hello World Docker container
+      community.docker.docker_container:
+        name: hello-world
+        image: hello-world
+        state: started
+        restart_policy: no
+

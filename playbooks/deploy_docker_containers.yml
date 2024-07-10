@@ -1,0 +1,71 @@
+- hosts: my_vm
+  become: yes
+  tasks:
+    - name: Pull MySQL Docker image for WAQAS
+      community.docker.docker_image:
+        name: mysql
+        tag: latest
+        source: pull
+
+    - name: Run MySQL container for WAQAS
+      community.docker.docker_container:
+        name: mysql-waqas
+        image: mysql:latest
+        state: started
+        env:
+          MYSQL_ROOT_PASSWORD: "root_password"
+          MYSQL_DATABASE: "zabbix"
+          MYSQL_USER: "zabbix"
+          MYSQL_PASSWORD: "zabbix"
+        ports:
+          - "3306:3306"
+        timeout: 300
+
+    - name: Pull Zabbix Docker image for WAQAS
+      community.docker.docker_image:
+        name: zabbix/zabbix-server-mysql
+        tag: latest
+        source: pull
+
+    - name: Run Zabbix container for WAQAS
+      community.docker.docker_container:
+        name: zabbix-waqas
+        image: zabbix/zabbix-server-mysql:latest
+        state: started
+        ports:
+          - "8081:80"
+          - "10052:10051"
+        env:
+          DB_SERVER_HOST: "mysql-waqas"
+          MYSQL_USER: "zabbix"
+          MYSQL_PASSWORD: "zabbix"
+          MYSQL_DATABASE: "zabbix"
+
+    - name: Pull Nagios Docker image for WAQAS
+      community.docker.docker_image:
+        name: jasonrivers/nagios
+        tag: latest
+        source: pull
+
+    - name: Run Nagios container for WAQAS
+      community.docker.docker_container:
+        name: nagios-waqas
+        image: jasonrivers/nagios:latest
+        state: started
+        ports:
+          - "8082:80"
+
+    - name: Pull Prometheus Docker image for WAQAS
+      community.docker.docker_image:
+        name: prom/prometheus
+        tag: v2.30.3
+        source: pull
+
+    - name: Run Prometheus container for WAQAS
+      community.docker.docker_container:
+        name: prometheus-waqas
+        image: prom/prometheus:v2.30.3
+        state: started
+        ports:
+          - "8083:9090"
+

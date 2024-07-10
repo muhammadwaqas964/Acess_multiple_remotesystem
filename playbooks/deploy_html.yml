@@ -1,0 +1,8 @@
+- hosts: my_vm
+  become: yes
+  tasks:
+    - name: Copy HTML file to remote server
+      copy:
+        src: ~/ansible/playbooks/your_page.html
+        dest: /root/waqas/your_page.html
+
